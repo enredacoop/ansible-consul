@@ -1,0 +1,43 @@
+---
+# Setup: set according to your application needs
+
+# ip
+ip: IP or Hostname
+
+# linux user (consul)
+linux_usergroup: users
+linux_userpassword: xxxxxx # recreate password when deployed
+linux_shell: /bin/bash
+
+# application name
+app_name: consul
+webapp_repo: git://github.com/consul/consul.git
+
+# RAILS_ENV
+rails_env: development
+
+# config timezone
+time_zone: 'Europe/Madrid'
+
+# ruby config
+ruby_version: 2.3.2
+gemoptions: "gem: --no-ri --no-rdoc"
+
+# nginx installation
+nginx_url: http://nginx.org/keys/nginx_signing.key
+nginx_repo_install: 'deb http://nginx.org/packages/ubuntu/ trusty nginx'
+
+# unicorn config
+unicorn_workers: 1
+unicorn_timeout: 15
+
+# postgres installation
+psql_version: 9.4
+psql_repo: 'deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main'
+psql_url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+
+# postgres set configs
+dbname: consuldb
+dbnametest: consuldb_test
+dbuser: consuluser
+dbpassword: xxxxxx # recreate password when deployed

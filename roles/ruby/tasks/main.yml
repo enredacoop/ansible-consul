@@ -1,0 +1,113 @@
+---
+- name: Clone rbenv repo
+  git:
+    repo=git://github.com/sstephenson/rbenv.git
+    version=master
+    dest=/home/consul/.rbenv
+  become: yes
+  become_user: consul
+  tags: ruby
+
+- name: Add rbenv path to .bash_profile
+  lineinfile:
+    dest=/home/consul/.bash_profile
+    line='export PATH="$HOME/.rbenv/bin:$PATH"'
+    owner=consul
+    state=present
+    insertafter=EOF
+    create=True
+  become: yes
+  become_user: consul
+
+- name: Add rbenv eval to .bash_profile
+  lineinfile:
+    dest=/home/consul/.bash_profile
+    line='eval "$(rbenv init -)"'
+    owner=consul
+    state=present
+    insertafter=EOF
+    create=True
+  become: yes
+  become_user: consul
+
+- name: Clone ruby build repo
+  git:
+    repo=git://github.com/sstephenson/ruby-build.git
+    version=master
+    dest=/home/consul/.rbenv/plugins/ruby-build
+  become: yes
+  become_user: consul
+  tags: ruby
+
+- name: Add ruby build path to .bash_profile
+  lineinfile:
+    dest=/home/consul/.bash_profile
+    line='export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"'
+    owner=consul
+    state=present
+    insertafter=EOF
+    create=True
+  become: yes
+  become_user: consul
+  
+- name: Clone rbenv-vars
+  git:
+    repo=git://github.com/sstephenson/rbenv-vars.git
+    version=master
+    dest=/home/consul/.rbenv/plugins/rbenv-vars
+  become: yes
+  become_user: consul
+  tags: ruby
+
+- name: Clone rbenv-rehash
+  git:
+    repo=git://github.com/sstephenson/rbenv-gem-rehash.git
+    version=master
+    dest=/home/consul/.rbenv/plugins/rbenv-gem-rehash
+  become: yes
+  become_user: consul
+  tags: ruby
+
+- name: Create .gemrc
+  lineinfile:
+    dest=/home/consul/.gemrc
+    line={{ gemoptions }}
+    owner=consul
+    state=present
+    insertafter=EOF
+    create=True
+  become: yes
+  become_user: consul
+
+- name: Install ruby version
+  shell: .rbenv/bin/rbenv install -v {{ ruby_version }} >> ruby_installed.txt
+  become: yes
+  become_user: consul
+  args:
+    chdir: /home/consul
+    creates: /home/consul/ruby_installed.txt
+  tags: ruby
+
+- name: Activate ruby version
+  shell: .rbenv/bin/rbenv global {{ ruby_version }} >> ruby_activated.txt
+  become: yes
+  become_user: consul
+  args:
+    chdir: /home/consul
+    creates: /home/consul/ruby_activated.txt
+  tags: ruby
+
+# There is a mistake loading .bash_profile file in order to update $PATH
+# Thats the reason why we use absolute path
+
+- name: Install bundler
+  shell: /home/consul/.rbenv/shims/gem install bundler
+  become: yes
+  become_user: consul
+  tags: ruby
+
+- name: Install rails
+  shell: /home/consul/.rbenv/shims/gem install rails -v 4.2.9
+  become: yes
+  become_user: consul
+  tags: ruby

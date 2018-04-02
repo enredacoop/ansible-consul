@@ -1,0 +1,14 @@
+---
+- name: App Server
+  hosts: web
+  become: yes
+  become_user: root
+  become_method: su
+  gather_facts: False
+  roles:
+    - common
+    - ruby
+    - postgresql
+    - webapp
+    - nginx
+    - unicorn

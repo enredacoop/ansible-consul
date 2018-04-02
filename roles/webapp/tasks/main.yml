@@ -1,0 +1,57 @@
+---
+- name: Clone Webapp repo
+  git:
+    repo={{webapp_repo}}
+    version=master
+    dest=/home/consul/consul
+  become: yes
+  become_user: consul
+  tags: webapp
+
+- name: Install webapp packages
+  shell: /home/consul/.rbenv/shims/bundle install
+  become: yes
+  become_user: consul
+  args:
+    chdir: /home/consul/consul
+  tags: webapp
+
+- name: Copy rbenv-vars
+  template: >
+    src=rbenv-vars.j2
+    dest=/home/consul/consul/.rbenv-vars
+  become: yes
+  become_user: consul
+  tags: webapp
+
+- name: Copy database.yml
+  template: >
+    src=database.yml.j2
+    dest=/home/consul/consul/config/database.yml
+  become: yes
+  become_user: consul
+  tags: webapp
+
+- name: Copy secrets.yml
+  template: >
+    src=secrets.yml.j2
+    dest=/home/consul/consul/config/secrets.yml
+  become: yes
+  become_user: consul
+  tags: webapp
+
+- name: Setup and apply migrations to the database
+  shell: /home/consul/.rbenv/shims/rake db:setup
+  become: yes
+  become_user: consul
+  args:
+    chdir: /home/consul/consul
+  tags: webapp
+
+- name: Populate the database
+  shell: /home/consul/.rbenv/shims/rake db:dev_seed
+  become: yes
+  become_user: consul
+  args:
+    chdir: /home/consul/consul
+  tags: webapp
